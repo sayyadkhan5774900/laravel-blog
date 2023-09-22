@@ -1,0 +1,293 @@
+
+php artisan make:migration create_posts_table
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreatePostsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('posts', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('authorId')->unsigned();
+            $table->bigInteger('parentId')->unsigned()->nullable();
+            $table->string('title', 75);
+            $table->string('metaTitle', 100)->nullable();
+            $table->string('slug', 100)->unique();
+            $table->text('summary')->nullable();
+            $table->tinyInteger('published')->default(0);
+            $table->dateTime('createdAt');
+            $table->dateTime('updatedAt')->nullable();
+            $table->dateTime('publishedAt')->nullable();
+            $table->text('content')->nullable();
+            $table->string('feature_image')->nullable();
+            $table->timestamps();
+
+            $table->foreign('authorId')->references('id')->on('user')->onDelete('NO ACTION')->onUpdate('NO ACTION');
+            $table->foreign('parentId')->references('id')->on('post')->onDelete('NO ACTION')->onUpdate('NO ACTION');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('post');
+    }
+}
+
+
+php artisan make:model Post
+
+
+<?php
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Post extends Model
+{
+    protected $fillable = [
+        'authorId',
+        'parentId',
+        'title',
+        'metaTitle',
+        'slug',
+        'summary',
+        'published',
+        'createdAt',
+        'updatedAt',
+        'publishedAt',
+        'content',
+        'feature_image',
+    ];
+
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'authorId');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(Post::class, 'parentId');
+    }
+
+    // Add any other relationships or methods as needed
+}
+
+
+php artisan make:migration create_post_comments_table
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreatePostCommentsTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('post_comments', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('postId')->unsigned();
+            $table->bigInteger('parentId')->unsigned()->nullable();
+            $table->string('title', 100);
+            $table->tinyInteger('published')->default(0);
+            $table->dateTime('createdAt');
+            $table->dateTime('publishedAt')->nullable();
+            $table->text('content')->nullable();
+            $table->timestamps();
+
+            $table->foreign('postId')
+                ->references('id')
+                ->on('posts')
+                ->onUpdate('NO ACTION')
+                ->onDelete('NO ACTION');
+
+            $table->foreign('parentId')
+                ->references('id')
+                ->on('post_comments')
+                ->onUpdate('NO ACTION')
+                ->onDelete('NO ACTION');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('post_comments');
+    }
+}
+
+
+
+php artisan make:model PostComment
+
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class PostComment extends Model
+{
+    protected $fillable = [
+        'postId',
+        'parentId',
+        'title',
+        'published',
+        'createdAt',
+        'publishedAt',
+        'content',
+    ];
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class, 'postId');
+    }
+
+    public function parentComment()
+    {
+        return $this->belongsTo(PostComment::class, 'parentId');
+    }
+
+    public function childComments()
+    {
+        return $this->hasMany(PostComment::class, 'parentId');
+    }
+}
+
+
+php artisan make:migration create_categories_table
+
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateCategoriesTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->bigInteger('parentId')->unsigned()->nullable();
+            $table->string('title', 75);
+            $table->string('metaTitle', 100)->nullable();
+            $table->string('slug', 100);
+            $table->text('content')->nullable();
+            $table->timestamps();
+
+            $table->foreign('parentId')
+                ->references('id')
+                ->on('categories')
+                ->onUpdate('NO ACTION')
+                ->onDelete('NO ACTION');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('categories');
+    }
+}
+
+
+
+php artisan make:model Category
+
+
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Category extends Model
+{
+    protected $fillable = [
+        'parentId',
+        'title',
+        'metaTitle',
+        'slug',
+        'content',
+    ];
+
+    public function parentCategory()
+    {
+        return $this->belongsTo(Category::class, 'parentId');
+    }
+
+    public function childCategories()
+    {
+        return $this->hasMany(Category::class, 'parentId');
+    }
+}
+
+
+
+php artisan make:migration create_category_post_table
+
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateCategoryPostTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('category_post', function (Blueprint $table) {
+            $table->bigInteger('post_id')->unsigned();
+            $table->bigInteger('category_id')->unsigned();
+            $table->primary(['post_id', 'category_id']);
+
+            $table->foreign('post_id')
+                ->references('id')
+                ->on('posts')
+                ->onUpdate('NO ACTION')
+                ->onDelete('NO ACTION');
+
+            $table->foreign('category_id')
+                ->references('id')
+                ->on('categories')
+                ->onUpdate('NO ACTION')
+                ->onDelete('NO ACTION');
+        });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('category_post');
+    }
+}
+
+
+php artisan make:model CategoryPost
+
+
+
+namespace App;
+
+use Illuminate\Database\Eloquent\Model;
+
+class CategoryPost extends Model
+{
+    protected $table = 'category_post';
+
+    protected $fillable = [
+        'post_id',
+        'category_id',
+    ];
+
+    public function post()
+    {
+        return $this->belongsTo(Post::class, 'post_id');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+}
+
+
+
+
