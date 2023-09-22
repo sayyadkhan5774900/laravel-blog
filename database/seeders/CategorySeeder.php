@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
@@ -15,17 +14,17 @@ class CategorySeeder extends Seeder
     {
         Category::factory()->create([
             'name' => 'Laravel',
-            'slug' => 'laravel'
+            'slug' => 'laravel',
         ]);
 
         Category::factory()->create([
             'name' => 'Javascript',
-            'slug' => 'javascript'
+            'slug' => 'javascript',
         ]);
 
         Category::factory()->create([
             'name' => 'AlpineJs',
-            'slug' => 'alpinejs'
+            'slug' => 'alpinejs',
         ]);
 
         // Define the number of categories you want to create

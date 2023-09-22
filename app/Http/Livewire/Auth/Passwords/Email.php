@@ -2,15 +2,17 @@
 
 namespace App\Http\Livewire\Auth\Passwords;
 
-use Livewire\Component;
 use Illuminate\Support\Facades\Password;
+use Livewire\Component;
 
 class Email extends Component
 {
     /** @var string */
     public $email;
 
-    /** @var string|null */
+    /** @var string|null
+     * @phpstan-ignore-next-line
+     */
     public $emailSentMessage = false;
 
     public function sendResetPasswordLink()

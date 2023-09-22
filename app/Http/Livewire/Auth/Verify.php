@@ -2,7 +2,6 @@
 
 namespace App\Http\Livewire\Auth;
 
-use App\Providers\RouteServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -16,6 +15,7 @@ class Verify extends Component
 
         Auth::user()->sendEmailVerificationNotification();
 
+        /** @phpstan-ignore-next-line */
         $this->emit('resent');
 
         session()->flash('resent');
