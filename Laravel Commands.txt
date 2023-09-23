@@ -4,4 +4,4 @@
 
 ./vendor/bin/pint
 
-php artisan make:filament-resource CategoryResource --generate --soft-deletes --view
+php artisan make:filament-resource PostResource --generate --soft-deletes --view
