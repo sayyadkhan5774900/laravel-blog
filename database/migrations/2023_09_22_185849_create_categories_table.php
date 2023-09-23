@@ -14,9 +14,16 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('slug');
+            $table->string('slug')->unique();
+            $table->bigInteger('parent_id')->unsigned()->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->foreign('parent_id')
+                ->references('id')
+                ->on('categories')
+                ->onUpdate('NO ACTION')
+                ->onDelete('NO ACTION');
         });
     }
 

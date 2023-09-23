@@ -1,0 +1,7 @@
+
+
+./vendor/bin/phpstan analyse
+
+./vendor/bin/pint
+
+php artisan make:filament-resource CategoryResource --generate --soft-deletes --view
